@@ -4,6 +4,7 @@ const ProfileComponent = () => {
   const [clickCount, setClickCount] = useState(0);
   const [timeSpent, setTimeSpent] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [advice, setAdvice] = useState(''); // State for storing advice
 
   const buttonRef = useRef(null);
   const startTimeRef = useRef(Date.now());
@@ -23,6 +24,21 @@ const ProfileComponent = () => {
   useEffect(() => {
     document.title = `Clicks: ${clickCount} | Time: ${timeSpent}s`;
   }, [clickCount, timeSpent]);
+
+  useEffect(() => {
+    const fetchAdvice = async () => {
+      try {
+        const response = await fetch('https://api.adviceslip.com/advice');
+        const data = await response.json();
+        setAdvice(data.slip.advice);
+      } catch (error) {
+        console.error('Error fetching advice:', error);
+        setAdvice('Failed to fetch advice. Please try again later.');
+      }
+    };
+
+    fetchAdvice();
+  }, []);
 
   const expensiveCalculation = useMemo(() => {
     let result = 0;
@@ -107,6 +123,11 @@ const ProfileComponent = () => {
               </ul>
             </div>
           )}
+        </div>
+
+        <div style={styles.adviceSection}>
+          <h2 style={styles.subheading}>Random Advice</h2>
+          <p style={styles.adviceText}>{advice}</p>
         </div>
       </div>
     </div>
@@ -202,6 +223,17 @@ const styles = {
     listStyleType: 'none',
     padding: 0,
     margin: 0,
+  },
+  adviceSection: {
+    marginTop: '2rem',
+    padding: '1.5rem',
+    backgroundColor: '#e0f7fa',
+    borderRadius: '8px',
+    textAlign: 'center',
+  },
+  adviceText: {
+    fontSize: '1.2rem',
+    color: '#00796b',
   },
 };
 
